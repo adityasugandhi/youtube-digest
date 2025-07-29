@@ -17,9 +17,9 @@ dependencies = [
     "alembic==1.13.1",
     "psycopg2-binary==2.9.9",
     
-    # Redis
-    "redis==5.0.1",
-    "celery==5.3.4",
+    # Redis (disabled)
+    # "redis==5.0.1",
+    # "celery==5.3.4",
     
     # YouTube API
     "google-api-python-client==2.108.0",

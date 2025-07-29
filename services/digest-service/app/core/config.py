@@ -19,9 +19,9 @@ class Settings(BaseSettings):
     database_pool_size: int = 10
     database_max_overflow: int = 20
     
-    # Redis
-    redis_url: str = "redis://localhost:6379"
-    redis_cache_ttl: int = 3600
+    # Redis (disabled)
+    # redis_url: str = "redis://localhost:6379"
+    # redis_cache_ttl: int = 3600
     
     # OpenAI Configuration
     openai_api_key: str
