@@ -1,0 +1,81 @@
+[project]
+name = "youtube-digest-backend"
+version = "1.0.0"
+description = "YouTube Live Stream Digest Backend Architecture"
+authors = [{name = "Developer", email = "developer@example.com"}]
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    # Core FastAPI dependencies
+    "fastapi==0.104.1",
+    "uvicorn[standard]==0.24.0",
+    "pydantic==2.5.0",
+    "pydantic-settings==2.1.0",
+    
+    # Database
+    "sqlalchemy==2.0.23",
+    "alembic==1.13.1",
+    "psycopg2-binary==2.9.9",
+    
+    # Redis
+    "redis==5.0.1",
+    "celery==5.3.4",
+    
+    # YouTube API
+    "google-api-python-client==2.108.0",
+    "youtube-transcript-api==0.6.1",
+    
+    # AI/ML APIs
+    "openai==1.3.7",
+    "anthropic==0.7.8",
+    "groq==0.4.1",
+    
+    # HTTP clients
+    "httpx==0.25.2",
+    "aiohttp==3.9.1",
+    
+    # Authentication & Security
+    "python-jose[cryptography]==3.3.0",
+    "passlib[bcrypt]==1.7.4",
+    "python-multipart==0.0.6",
+    
+    # Monitoring & Logging
+    "prometheus-client==0.19.0",
+    "sentry-sdk[fastapi]==1.38.0",
+    
+    # Utilities
+    "python-dotenv==1.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest==7.4.3",
+    "pytest-asyncio==0.21.1",
+    "pytest-cov==4.1.0",
+    "black==23.11.0",
+    "isort==5.12.0",
+    "flake8==6.1.0",
+    "pre-commit==3.6.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["services"]
+
+[tool.black]
+line-length = 88
+target-version = ['py311']
+
+[tool.isort]
+profile = "black"
+multi_line_output = 3
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
