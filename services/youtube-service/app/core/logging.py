@@ -56,8 +56,8 @@ def setup_logging() -> None:
     logging.getLogger("uvicorn.access").setLevel(logging.WARNING)
     logging.getLogger("httpx").setLevel(logging.WARNING)
     
-    # Setup Sentry if configured
-    if settings.sentry_dsn:
+    # Setup Sentry if configured with a valid DSN
+    if settings.sentry_dsn and settings.sentry_dsn != "your_sentry_dsn_here" and settings.sentry_dsn.startswith("https://"):
         try:
             import sentry_sdk
             from sentry_sdk.integrations.fastapi import FastApiIntegration
@@ -67,7 +67,7 @@ def setup_logging() -> None:
                 dsn=settings.sentry_dsn,
                 environment=settings.environment,
                 integrations=[
-                    FastApiIntegration(auto_enabling_integrations=False),
+                    FastApiIntegration(),
                     SqlalchemyIntegration(),
                 ],
                 traces_sample_rate=0.1 if settings.environment == "production" else 1.0,
