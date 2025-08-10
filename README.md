@@ -58,18 +58,28 @@ cd services/digest-service
 uv run uvicorn app.main:app --host 0.0.0.0 --port 8002 --reload
 ```
 
-4. **Access services:**
+4. **Start automation service:**
+```bash
+# Automation Service (Terminal 3)
+cd services/automation
+uv run uvicorn api:app --host 0.0.0.0 --port 8003 --reload
+```
+
+5. **Access services:**
 - **API Gateway**: http://localhost:80
 - **YouTube Service**: http://localhost:8001
 - **Digest Service**: http://localhost:8002
+- **Automation Service**: http://localhost:8003
 - **API Documentation**: 
   - YouTube: http://localhost:8001/docs
   - Digest: http://localhost:8002/docs
+  - Automation: http://localhost:8003/docs
 
-## 📚 API Usage
+## 📚 API Reference
 
-### Extract Transcript
+### 🎬 YouTube Service (Port 8001)
 
+#### Transcripts
 ```bash
 # Single transcript
 curl "http://localhost:8001/api/v1/transcripts/VIDEO_ID"
@@ -80,10 +90,23 @@ curl -X POST "http://localhost:8001/api/v1/transcripts/batch" \
   -d '{"video_ids": ["video1", "video2"], "concurrent_limit": 5}'
 ```
 
-### Generate Digest
-
+#### Streams & Channels
 ```bash
-# Generate digest
+# Get completed streams from channel
+curl "http://localhost:8001/api/v1/streams/channel/CHANNEL_ID/completed?max_results=10&include_transcripts=true"
+
+# Resolve channel handle to ID
+curl "http://localhost:8001/api/v1/streams/resolve/@channelhandle"
+
+# Get video info
+curl "http://localhost:8001/api/v1/streams/VIDEO_ID/info"
+```
+
+### 🤖 Digest Service (Port 8002)
+
+#### Generate Digests
+```bash
+# Single digest generation
 curl -X POST "http://localhost:8002/api/v1/digests/generate" \
   -H "Content-Type: application/json" \
   -d '{
@@ -95,13 +118,85 @@ curl -X POST "http://localhost:8002/api/v1/digests/generate" \
     },
     "focus_areas": "Federal Reserve policy"
   }'
+
+# Batch digest generation
+curl -X POST "http://localhost:8002/api/v1/digests/batch" \
+  -H "Content-Type: application/json" \
+  -d '[{"video_id": "video1", "transcript": "text1"}, {"video_id": "video2", "transcript": "text2"}]'
+
+# Get digest by ID
+curl "http://localhost:8002/api/v1/digests/DIGEST_ID"
 ```
 
-### Get Channel Streams
-
+#### Pipeline Processing
 ```bash
-# Get completed streams from channel
-curl "http://localhost:8001/api/v1/streams/channel/CHANNEL_ID/completed?max_results=10&include_transcripts=true"
+# Process single video stream
+curl -X POST "http://localhost:8002/api/v1/pipeline/process-stream/VIDEO_ID"
+
+# Process entire channel
+curl -X POST "http://localhost:8002/api/v1/pipeline/process-channel/CHANNEL_ID"
+```
+
+### 🔄 Automation Service (Port 8003)
+
+#### Semantic Search
+```bash
+# Advanced semantic search
+curl -X POST "http://localhost:8003/api/v1/search" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "query": "Tesla earnings and stock predictions",
+    "n_results": 10,
+    "channel_filter": "Amit Investing",
+    "category_filter": "investing"
+  }'
+
+# Recent videos
+curl "http://localhost:8003/api/v1/search/recent?n_results=20&channel_filter=Meet%20Kevin"
+
+# Channel-specific search
+curl "http://localhost:8003/api/v1/search/by-channel/Amit%20Investing?query=NVIDIA&n_results=5"
+
+# Search video chunks
+curl -X POST "http://localhost:8003/api/v1/search/chunks" \
+  -H "Content-Type: application/json" \
+  -d '{"query": "Fed rate decision", "n_results": 5}'
+
+# Get video chunks
+curl "http://localhost:8003/api/v1/video/VIDEO_ID/chunks"
+```
+
+#### Channel Management
+```bash
+# List all channels
+curl "http://localhost:8003/api/v1/channels"
+
+# Get channel videos
+curl "http://localhost:8003/api/v1/channel/CHANNEL_ID/videos"
+```
+
+#### Analytics & Insights
+```bash
+# Get video insights
+curl "http://localhost:8003/api/v1/insights/VIDEO_ID"
+
+# System statistics
+curl "http://localhost:8003/api/v1/stats"
+
+# Supadata statistics
+curl "http://localhost:8003/api/v1/stats/supadata"
+```
+
+#### Health Monitoring
+```bash
+# Quick health check
+curl "http://localhost:8003/health"
+
+# Full health check
+curl "http://localhost:8003/health/full"
+
+# Health summary
+curl "http://localhost:8003/health/summary"
 ```
 
 ## 🐳 Docker Deployment
@@ -151,10 +246,14 @@ docker-compose -f docker-compose.prod.yml up -d
 | Variable | Description | Default |
 |----------|-------------|---------|
 | `YOUTUBE_API_KEY` | YouTube Data API key | Required |
-| `OPENAI_API_KEY` | OpenAI API key | Required |
-| `ANTHROPIC_API_KEY` | Anthropic API key | Optional |
-| `DATABASE_URL` | PostgreSQL connection string | Required |
+| `GEMINI_API_KEY` | Gemini API key for AI summaries | Required |
+| `OPENAI_API_KEY` | OpenAI API key (fallback) | Optional |
+| `ANTHROPIC_API_KEY` | Anthropic API key (fallback) | Optional |
+| `DATABASE_URL` | PostgreSQL connection string | Optional |
 | `REDIS_URL` | Redis connection string | `redis://localhost:6379` |
+| `CHROMA_DB_PATH` | ChromaDB storage path | `/app/data/chroma_db` |
+| `AUTOMATION_API_PORT` | Automation service port | `8003` |
+| `RUN_ON_STARTUP` | Run pipeline on service startup | `false` |
 | `RATE_LIMIT_REQUESTS` | Requests per hour | `100` |
 
 ## 🧪 Testing
@@ -190,13 +289,35 @@ flake8 services/
 - **Logging**: Structured logging with configurable levels
 - **Tracing**: Request timing and performance metrics
 
+## 🤖 Automation Features
+
+### ✅ Automated Pipeline
+- **Hourly Processing**: Automatically fetches and processes videos from configured channels
+- **AI Summarization**: Generates Robinhood Cortex-style financial summaries using Gemini
+- **Vector Database**: Stores summaries with embeddings in ChromaDB for semantic search
+- **Smart Duplicate Detection**: Prevents reprocessing of existing videos
+- **Rate Limiting**: Respects API quotas with intelligent delays
+
+### ✅ Semantic Search
+- **Vector Embeddings**: Advanced semantic search across all video summaries
+- **Multi-filter Support**: Filter by channel, presenter, category, date
+- **Similarity Scoring**: Relevance ranking for search results
+- **Chunk-based Search**: Search within video transcript segments
+
+### ✅ Channel Management
+- **Dynamic Configuration**: Add/remove channels via API
+- **Enable/Disable**: Control which channels are processed
+- **Metadata Tracking**: Channel info, presenters, categories
+- **Statistics**: Processing stats and performance metrics
+
 ## 🚧 TODO
 
 - [ ] Implement database models and migrations
 - [ ] Add comprehensive test suite
 - [ ] Set up CI/CD pipeline
 - [ ] Add Kubernetes deployment manifests
-- [ ] Implement stream processor with Celery
+- [x] Implement automation service with scheduling
+- [x] Add vector database with semantic search
 - [ ] Add authentication and authorization
 - [ ] Set up monitoring dashboards
 
