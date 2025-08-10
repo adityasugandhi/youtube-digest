@@ -8,9 +8,8 @@ A microservices architecture for processing YouTube live streams and generating 
 
 ## 🏗️ Architecture
 
-- **YouTube Service**: Extracts transcripts from completed YouTube live streams
-- **Digest Generator**: Creates AI-powered financial digests in Robinhood's bullet-point format
-- **Stream Processor**: Handles batch processing and workflow orchestration
+- **Automation Service**: Complete YouTube processing pipeline with transcript extraction, AI-powered digest generation, and semantic search
+- **Vector Database**: ChromaDB for storing summaries with embeddings
 - **API Gateway**: NGINX-based request routing and load balancing
 
 ## 🚀 Quick Start
@@ -47,97 +46,21 @@ source .venv/bin/activate
 uv pip install -e .
 ```
 
-3. **Start services:**
+3. **Start automation service:**
 ```bash
-# YouTube Service (Terminal 1)
-cd services/youtube-service
-uv run uvicorn app.main:app --host 0.0.0.0 --port 8001 --reload
-
-# Digest Service (Terminal 2)
-cd services/digest-service  
-uv run uvicorn app.main:app --host 0.0.0.0 --port 8002 --reload
-```
-
-4. **Start automation service:**
-```bash
-# Automation Service (Terminal 3)
+# Automation Service - The only service you need!
 cd services/automation
 uv run uvicorn api:app --host 0.0.0.0 --port 8003 --reload
 ```
 
-5. **Access services:**
+4. **Access services:**
 - **API Gateway**: http://localhost:80
-- **YouTube Service**: http://localhost:8001
-- **Digest Service**: http://localhost:8002
-- **Automation Service**: http://localhost:8003
-- **API Documentation**: 
-  - YouTube: http://localhost:8001/docs
-  - Digest: http://localhost:8002/docs
-  - Automation: http://localhost:8003/docs
+- **Automation Service**: http://localhost:8003  
+- **API Documentation**: http://localhost:8003/docs
 
 ## 📚 API Reference
 
-### 🎬 YouTube Service (Port 8001)
-
-#### Transcripts
-```bash
-# Single transcript
-curl "http://localhost:8001/api/v1/transcripts/VIDEO_ID"
-
-# Batch transcripts
-curl -X POST "http://localhost:8001/api/v1/transcripts/batch" \
-  -H "Content-Type: application/json" \
-  -d '{"video_ids": ["video1", "video2"], "concurrent_limit": 5}'
-```
-
-#### Streams & Channels
-```bash
-# Get completed streams from channel
-curl "http://localhost:8001/api/v1/streams/channel/CHANNEL_ID/completed?max_results=10&include_transcripts=true"
-
-# Resolve channel handle to ID
-curl "http://localhost:8001/api/v1/streams/resolve/@channelhandle"
-
-# Get video info
-curl "http://localhost:8001/api/v1/streams/VIDEO_ID/info"
-```
-
-### 🤖 Digest Service (Port 8002)
-
-#### Generate Digests
-```bash
-# Single digest generation
-curl -X POST "http://localhost:8002/api/v1/digests/generate" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "video_id": "abc123",
-    "transcript": "transcript text...",
-    "metadata": {
-      "channel_name": "CNBC",
-      "video_title": "Fed Meeting Live"
-    },
-    "focus_areas": "Federal Reserve policy"
-  }'
-
-# Batch digest generation
-curl -X POST "http://localhost:8002/api/v1/digests/batch" \
-  -H "Content-Type: application/json" \
-  -d '[{"video_id": "video1", "transcript": "text1"}, {"video_id": "video2", "transcript": "text2"}]'
-
-# Get digest by ID
-curl "http://localhost:8002/api/v1/digests/DIGEST_ID"
-```
-
-#### Pipeline Processing
-```bash
-# Process single video stream
-curl -X POST "http://localhost:8002/api/v1/pipeline/process-stream/VIDEO_ID"
-
-# Process entire channel
-curl -X POST "http://localhost:8002/api/v1/pipeline/process-channel/CHANNEL_ID"
-```
-
-### 🔄 Automation Service (Port 8003)
+### 🔄 Automation Service (Port 8003) - All-in-One Solution
 
 #### Semantic Search
 ```bash

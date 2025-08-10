@@ -1,38 +1,6 @@
 version: '3.8'
 
 services:
-  # YouTube Service
-  youtube-service:
-    build:
-      context: ./services/youtube-service
-      dockerfile: Dockerfile
-    ports:
-      - "8001:8001"
-    env_file:
-      - .env
-    environment:
-      - DATABASE_URL=postgresql://user:password@postgres:5432/youtube_digest
-      # REDIS_URL=redis://redis:6379  # Redis disabled
-      - DEBUG=true
-      - LOG_LEVEL=INFO
-      - ENVIRONMENT=development
-      - HOST=0.0.0.0
-      - PORT=8001
-    depends_on:
-      - postgres
-    volumes:
-      - ./services/youtube-service/app:/app/app
-      - ./services/shared:/app/shared
-    restart: unless-stopped
-    networks:
-      - app-network
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8001/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
-
   # Automation Service (YouTube Summarization Pipeline with Qdrant)
   automation-service:
     build:
@@ -63,38 +31,6 @@ services:
       - app-network
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8003/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
-
-  # Digest Service
-  digest-service:
-    build:
-      context: ./services/digest-service
-      dockerfile: Dockerfile
-    ports:
-      - "8002:8002"
-    env_file:
-      - .env
-    environment:
-      - DATABASE_URL=postgresql://user:password@postgres:5432/youtube_digest
-      # REDIS_URL=redis://redis:6379  # Redis disabled
-      - DEBUG=true
-      - LOG_LEVEL=INFO
-      - ENVIRONMENT=development
-      - HOST=0.0.0.0
-      - PORT=8002
-    depends_on:
-      - postgres
-    volumes:
-      - ./services/digest-service/app:/app/app
-      - ./services/shared:/app/shared
-    restart: unless-stopped
-    networks:
-      - app-network
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8002/health"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -151,8 +87,7 @@ services:
       - ./infrastructure/docker/nginx/proxy_params:/etc/nginx/proxy_params:ro
       - ./infrastructure/docker/nginx/ssl:/etc/nginx/ssl:ro
     depends_on:
-      - youtube-service
-      - digest-service
+      - automation-service
     restart: unless-stopped
     networks:
       - app-network

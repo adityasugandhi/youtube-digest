@@ -108,4 +108,4 @@ test_outputs/
 test_logs/
 
 # Checkpoint files with sensitive data
-checkpoint/
+checkpoint/qdrant_storage/
