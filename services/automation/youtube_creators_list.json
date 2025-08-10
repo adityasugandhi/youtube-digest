@@ -1,0 +1,104 @@
+[
+  {
+    "channel_name": "Cashflow Chronicles TV",
+    "channel_url": "https://www.youtube.com/@CashflowChroniclesTV",
+    "presenters": [
+      "Kris",
+      "Matt"
+    ],
+    "channel_id": "UCTrkevUjAS9RwyVgt1AS1sg",
+    "enabled": true,
+    "last_processed": "2025-08-09T18:41:31.015214",
+    "category": "investing"
+  },
+  {
+    "channel_name": "Matt Money Streams",
+    "channel_url": "https://www.youtube.com/@RealMattMoney/streams",
+    "presenters": [
+      "Matt"
+    ],
+    "channel_id": "UCyZNir5FhvazX5L3_Q77UbA",
+    "enabled": true,
+    "last_processed": "2025-08-09T18:41:31.015214",
+    "category": "investing"
+  },
+  {
+    "channel_name": "Data Driven Investing",
+    "channel_url": "https://www.youtube.com/@DataDInvesting/streams",
+    "presenters": [
+      "Chris"
+    ],
+    "channel_id": "UC2beGd_KeBxlPus-RGmYI1g",
+    "enabled": true,
+    "last_processed": "2025-08-09T18:41:31.015214",
+    "category": "investing"
+  },
+  {
+    "channel_name": "Future Investing",
+    "channel_url": "https://www.youtube.com/@futurenvesting",
+    "presenters": [
+      "Tannor"
+    ],
+    "channel_id": "UCvWx0-NX-9qVLCSW9yjdX-g",
+    "enabled": true,
+    "last_processed": "2025-08-09T18:41:31.015214",
+    "category": "investing"
+  },
+  {
+    "channel_name": "Amit Investing",
+    "channel_url": "https://www.youtube.com/@amitinvesting",
+    "presenters": [
+      "Amit Kukreja"
+    ],
+    "channel_id": "UCjZnbgPb08NFg7MHyPQRZ3Q",
+    "enabled": true,
+    "last_processed": "2025-08-09T18:41:31.015214",
+    "category": "investing"
+  },
+  {
+    "channel_name": "Farzad Media INC",
+    "channel_url": "https://www.youtube.com/@FarzadMediaINC",
+    "presenters": [
+      "Farzad"
+    ],
+    "channel_id": "UCgbyN_o-Guwpyqfuuz3pyIw",
+    "enabled": true,
+    "last_processed": null,
+    "category": "investing"
+  },
+  {
+    "channel_name": "Dumb Money Live",
+    "channel_url": "https://www.youtube.com/@DumbMoneyLive",
+    "presenters": [
+      "Dave Hanson",
+      "Chris Camillo",
+      "Jordan Mclain"
+    ],
+    "channel_id": "UC92A1RTIbxdKczZgPJZXnUA",
+    "enabled": true,
+    "last_processed": null,
+    "category": "investing"
+  },
+  {
+    "channel_name": "Meet Kevin",
+    "channel_url": "https://www.youtube.com/@MeetKevin",
+    "presenters": [
+      "Kevin"
+    ],
+    "channel_id": "UCLtREJY21xRfCuEKvdki1Kw",
+    "enabled": true,
+    "last_processed": null,
+    "category": "investing"
+  },
+  {
+    "channel_name": "Martin Shkreli",
+    "channel_url": "https://www.youtube.com/@realmartinshkreli",
+    "presenters": [
+      "Martin Shkreli"
+    ],
+    "channel_id": "UC9R9ZkApbhtkR7fVuzKiJvA",
+    "enabled": true,
+    "last_processed": null,
+    "category": "investing"
+  }
+]

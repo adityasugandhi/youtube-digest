@@ -8,23 +8,65 @@ services:
       dockerfile: Dockerfile
     ports:
       - "8001:8001"
+    env_file:
+      - .env
     environment:
       - DATABASE_URL=postgresql://user:password@postgres:5432/youtube_digest
-      - REDIS_URL=redis://redis:6379
-      - YOUTUBE_API_KEY=${YOUTUBE_API_KEY}
-      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      # REDIS_URL=redis://redis:6379  # Redis disabled
       - DEBUG=true
       - LOG_LEVEL=INFO
       - ENVIRONMENT=development
+      - HOST=0.0.0.0
+      - PORT=8001
     depends_on:
       - postgres
-      - redis
     volumes:
       - ./services/youtube-service/app:/app/app
       - ./services/shared:/app/shared
     restart: unless-stopped
     networks:
       - app-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Automation Service (YouTube Summarization Pipeline with Qdrant)
+  automation-service:
+    build:
+      context: ./services/automation
+      dockerfile: Dockerfile
+    ports:
+      - "8003:8003"
+    env_file:
+      - .env
+    environment:
+      - DEBUG=true
+      - LOG_LEVEL=INFO
+      - ENVIRONMENT=development
+      - HOST=0.0.0.0
+      - PORT=8003
+      - QDRANT_HOST=host.docker.internal
+      - QDRANT_PORT=6333
+      - COLLECTION_YT=youtube_transcripts
+      - EMBED_MODEL=intfloat/e5-base-v2
+      - RUN_ON_STARTUP=false
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - ./services/automation:/app
+      - automation_data:/app/data
+    restart: unless-stopped
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8003/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
   # Digest Service
   digest-service:
@@ -33,23 +75,30 @@ services:
       dockerfile: Dockerfile
     ports:
       - "8002:8002"
+    env_file:
+      - .env
     environment:
       - DATABASE_URL=postgresql://user:password@postgres:5432/youtube_digest
-      - REDIS_URL=redis://redis:6379
-      - OPENAI_API_KEY=${OPENAI_API_KEY}
-      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      # REDIS_URL=redis://redis:6379  # Redis disabled
       - DEBUG=true
       - LOG_LEVEL=INFO
       - ENVIRONMENT=development
+      - HOST=0.0.0.0
+      - PORT=8002
     depends_on:
       - postgres
-      - redis
     volumes:
       - ./services/digest-service/app:/app/app
       - ./services/shared:/app/shared
     restart: unless-stopped
     networks:
       - app-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8002/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
   # PostgreSQL Database
   postgres:
@@ -65,6 +114,11 @@ services:
     restart: unless-stopped
     networks:
       - app-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user -d youtube_digest"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   # Redis Cache & Message Broker
   redis:
@@ -77,24 +131,41 @@ services:
     restart: unless-stopped
     networks:
       - app-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
 
-  # NGINX API Gateway (optional for development)
+# Note: Using external Qdrant container running on host
+  # Qdrant vector database is running externally on localhost:6333
+
+  # NGINX API Gateway
   nginx:
     image: nginx:alpine
     ports:
       - "80:80"
+      - "443:443"
     volumes:
       - ./infrastructure/docker/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./infrastructure/docker/nginx/proxy_params:/etc/nginx/proxy_params:ro
+      - ./infrastructure/docker/nginx/ssl:/etc/nginx/ssl:ro
     depends_on:
       - youtube-service
       - digest-service
     restart: unless-stopped
     networks:
       - app-network
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
 volumes:
   postgres_data:
   redis_data:
+  automation_data:
 
 networks:
   app-network:

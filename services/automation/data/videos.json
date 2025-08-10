@@ -1,0 +1,18 @@
+[
+  {
+    "channel_id": "UCabc123",
+    "channel_title": "My Channel",
+    "video_id": "VID123", 
+    "title": "Example Video",
+    "published_at": "2025-08-01T12:00:00Z",
+    "url": "https://www.youtube.com/watch?v=VID123"
+  },
+  {
+    "channel_id": "UCdef456",
+    "channel_title": "Tech Channel", 
+    "video_id": "VID456",
+    "title": "Tech Tutorial",
+    "published_at": "2025-08-02T15:30:00Z",
+    "url": "https://www.youtube.com/watch?v=VID456"
+  }
+]
