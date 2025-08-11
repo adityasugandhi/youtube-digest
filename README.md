@@ -54,7 +54,7 @@ uv run uvicorn api:app --host 0.0.0.0 --port 8003 --reload
 ```
 
 4. **Access services:**
-- **API Gateway**: http://localhost:80
+- **API Gateway**: http://localhost:8080
 - **Automation Service**: http://localhost:8003  
 - **API Documentation**: http://localhost:8003/docs
 
@@ -65,7 +65,7 @@ uv run uvicorn api:app --host 0.0.0.0 --port 8003 --reload
 #### Semantic Search
 ```bash
 # Advanced semantic search
-curl -X POST "http://localhost:8003/api/v1/search" \
+curl -X POST "http://localhost:8003/search" \
   -H "Content-Type: application/json" \
   -d '{
     "query": "Tesla earnings and stock predictions",
@@ -75,39 +75,39 @@ curl -X POST "http://localhost:8003/api/v1/search" \
   }'
 
 # Recent videos
-curl "http://localhost:8003/api/v1/search/recent?n_results=20&channel_filter=Meet%20Kevin"
+curl "http://localhost:8003/search/recent?n_results=20&channel_filter=Meet%20Kevin"
 
 # Channel-specific search
-curl "http://localhost:8003/api/v1/search/by-channel/Amit%20Investing?query=NVIDIA&n_results=5"
+curl "http://localhost:8003/search/by-channel/Amit%20Investing?query=NVIDIA&n_results=5"
 
 # Search video chunks
-curl -X POST "http://localhost:8003/api/v1/search/chunks" \
+curl -X POST "http://localhost:8003/search/chunks" \
   -H "Content-Type: application/json" \
   -d '{"query": "Fed rate decision", "n_results": 5}'
 
 # Get video chunks
-curl "http://localhost:8003/api/v1/video/VIDEO_ID/chunks"
+curl "http://localhost:8003/video/VIDEO_ID/chunks"
 ```
 
 #### Channel Management
 ```bash
 # List all channels
-curl "http://localhost:8003/api/v1/channels"
+curl "http://localhost:8003/channels"
 
 # Get channel videos
-curl "http://localhost:8003/api/v1/channel/CHANNEL_ID/videos"
+curl "http://localhost:8003/channel/CHANNEL_ID/videos"
 ```
 
 #### Analytics & Insights
 ```bash
 # Get video insights
-curl "http://localhost:8003/api/v1/insights/VIDEO_ID"
+curl "http://localhost:8003/insights/VIDEO_ID"
 
 # System statistics
-curl "http://localhost:8003/api/v1/stats"
+curl "http://localhost:8003/stats"
 
 # Supadata statistics
-curl "http://localhost:8003/api/v1/stats/supadata"
+curl "http://localhost:8003/stats/supadata"
 ```
 
 #### Health Monitoring
@@ -126,12 +126,18 @@ curl "http://localhost:8003/health/summary"
 
 ### Development
 ```bash
-docker-compose up -d
+docker compose up -d
 ```
+
+**Access Points:**
+- API Gateway: http://localhost:8080
+- Automation Service: http://localhost:8003
+- PostgreSQL: localhost:5433
+- Redis: localhost:6379
 
 ### Production
 ```bash
-docker-compose -f docker-compose.prod.yml up -d
+docker compose -f docker-compose.prod.yml up -d
 ```
 
 ## 📊 Example Response

@@ -99,7 +99,7 @@ curl http://localhost/health/automation
 
 #### Semantic Search
 ```bash
-POST /api/v1/search
+POST /search
 {
   "query": "Tesla earnings and stock predictions",
   "n_results": 10,
@@ -110,41 +110,19 @@ POST /api/v1/search
 
 #### Recent Videos
 ```bash
-GET /api/v1/search/recent?n_results=20&channel_filter=Meet%20Kevin
+GET /search/recent?n_results=20&channel_filter=Meet%20Kevin
 ```
 
 #### Channel-Specific Search
 ```bash
-GET /api/v1/search/by-channel/Amit%20Investing?query=NVIDIA&n_results=5
-```
-
-#### Presenter Search
-```bash
-GET /api/v1/search/by-presenter/Kevin?n_results=10
+GET /search/by-channel/Amit%20Investing?query=NVIDIA&n_results=5
 ```
 
 ### Channel Management
 
 #### List Channels
 ```bash
-GET /api/v1/channels
-```
-
-#### Add Channel
-```bash
-POST /api/v1/channels
-{
-  "channel_name": "New Channel",
-  "channel_url": "https://www.youtube.com/@newchannel",
-  "presenters": ["Presenter Name"],
-  "category": "investing",
-  "enabled": true
-}
-```
-
-#### Enable/Disable Channel
-```bash
-PUT /api/v1/channels/Amit%20Investing/enable?enabled=true
+GET /channels
 ```
 
 ### Pipeline Control
@@ -190,7 +168,7 @@ class YouTubeDigestAPI {
     channelFilter?: string;
     categoryFilter?: string;
   } = {}): Promise<SearchResult[]> {
-    const response = await fetch(`${this.automationServiceUrl}/api/v1/search`, {
+    const response = await fetch(`${this.automationServiceUrl}/search`, {
       method: 'POST',
       headers: this.getAuthHeaders(),
       body: JSON.stringify({
@@ -207,7 +185,7 @@ class YouTubeDigestAPI {
   // Get recent videos
   async getRecentVideos(nResults: number = 20): Promise<VideoResult[]> {
     const response = await fetch(
-      `${this.automationServiceUrl}/api/v1/search/recent?n_results=${nResults}`,
+      `${this.automationServiceUrl}/search/recent?n_results=${nResults}`,
       { headers: this.getAuthHeaders() }
     )
     
@@ -216,7 +194,7 @@ class YouTubeDigestAPI {
   
   // Channel-specific search
   async searchChannelVideos(channelName: string, query?: string): Promise<VideoResult[]> {
-    const url = new URL(`${this.automationServiceUrl}/api/v1/search/by-channel/${encodeURIComponent(channelName)}`)
+    const url = new URL(`${this.automationServiceUrl}/search/by-channel/${encodeURIComponent(channelName)}`)
     if (query) url.searchParams.set('query', query)
     
     const response = await fetch(url.toString(), { headers: this.getAuthHeaders() })
@@ -225,7 +203,7 @@ class YouTubeDigestAPI {
   
   // Get available channels
   async getChannels(): Promise<Channel[]> {
-    const response = await fetch(`${this.automationServiceUrl}/api/v1/channels`, {
+    const response = await fetch(`${this.automationServiceUrl}/channels`, {
       headers: this.getAuthHeaders()
     })
     
